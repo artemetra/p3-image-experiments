@@ -1,40 +1,49 @@
 #include <iostream>
 #include <fstream>
-#include <math.h>
-#include <ctime>
-#include <cstdlib>
 
-int norm_cos(int input){
-    //\operatorname{round}\left(\frac{255}{2}\left(\cos\left(20\left(x-180\right)\right)+1\right)\right)
-    return int((255/2)*(cos(20*(input - 180))+1));
-}
+#include <sstream>
 
 int main() {
 
-    auto MAX_SIZE = std::make_pair(2000, 2000);
+    std::ifstream image;
+    std::ofstream newimage;
 
-    std::ofstream image;
+    image.open("bird2.ppm");
+    newimage.open("Monument.ppm");
 
-    image.open("image.ppm");
+    // copy over header info
+    std::string type = "", width = "", height = "", RGB = "";
+    image >> type;
+    image >> width;
+    image >> height;
+    image >> RGB;
 
-    srand(time(0));
+    newimage << type << std::endl;
+    newimage << width << " " << height << std::endl;
+    newimage << RGB << std::endl;
+    
+    std::string red = "", green = "", blue = "";
+    int r = 0, g = 0, b = 0;
+    while(!image.eof()){
+        image >> red;
+        image >> green;
+        image >> blue;
 
-    if(image.is_open()) {
-        image << "P3" << std::endl;
-        image << MAX_SIZE.first << " " << MAX_SIZE.second << std::endl;
-        //image << 250 << " " << 250 << std::endl;
-        image << "255" << std::endl;
+        std::stringstream redstream(red);
+        std::stringstream greenstream(green);
+        std::stringstream bluestream(blue);
+        redstream >> r;
+        greenstream >> g;
+        bluestream >> b;
 
-        for(int y = 0; y < MAX_SIZE.second; y++){
-            for(int x = 0; x < MAX_SIZE.first; x++){
-                int br = rand() % 255;
-                //std::cout << "Printing line " << x << "...." << std::endl;
-                image << br << " " << br << " " << br << std::endl;
-            }
-        }
+        b = std::min(b + 100, 255);
+
+        newimage << r << " " << g << " " << b << std::endl;
     }
 
+
     image.close();
+    newimage.close();
 
     return 0;
 }
